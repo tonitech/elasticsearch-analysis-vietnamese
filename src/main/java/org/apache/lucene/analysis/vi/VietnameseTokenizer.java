@@ -27,6 +27,10 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
+
 
 /**
  * Vietnamese Tokenizer.
@@ -54,9 +58,14 @@ public class VietnameseTokenizer extends Tokenizer {
 
     private void tokenize() throws IOException {
         inputText = IOUtils.toString(input);
-        final List<TaggedWord> result = tokenizer.tokenize(new StringReader(inputText));
-        if (result != null) {
-            pending.addAll(result);
+        try {
+            final List<TaggedWord> result = AccessController.doPrivileged(
+                    (PrivilegedExceptionAction<List<TaggedWord>>) () -> tokenizer.tokenize(new StringReader(inputText)));
+            if (result != null) {
+                pending.addAll(result);
+            }
+        } catch (PrivilegedActionException e) {
+            throw (IOException) e.getException();
         }
     }
 
@@ -79,21 +88,25 @@ public class VietnameseTokenizer extends Tokenizer {
                 typeAtt.setType(String.format("<%s>", word.getRule().getName().toUpperCase()));
                 termAtt.copyBuffer(word.getText().toCharArray(), 0, length);
                 final int start = inputText.indexOf(word.getText(), offset);
-                int startChange = -1;
+                int startChange = start;
                 int lengthChange = length;
 
-                // fix same word phrase and multi space bug
-                if(word.getText().indexOf(" ") < 0) {
-                    startChange = inputText.indexOf(word.getText(), offset);
-                } else {
+                if (start < 0) {
                     // fix multi space bug
                     // #67, #68
-                    String[] originArray = word.getText().split(" ");
-                    String firstWord = originArray[0];
-                    String lastWord = originArray[originArray.length - 1];
-                    startChange = inputText.indexOf(firstWord, offset);
-                    lengthChange = inputText.indexOf(lastWord, startChange + firstWord.length()) - startChange
-                            + lastWord.length();
+                    if (word.getText() != null) {
+                        String[] originArray = word.getText().split(" ");
+                        String firstWord = originArray[0];
+                        String lastWord = originArray[originArray.length - 1];
+                        startChange = inputText.indexOf(firstWord, offset);
+                        if (originArray.length == 1) {
+                            lengthChange = inputText.indexOf(lastWord, offset) - startChange
+                                    + lastWord.length();
+                        } else {
+                            lengthChange = inputText.indexOf(lastWord, startChange + firstWord.length()) - startChange
+                                    + lastWord.length();
+                        }
+                    }
                 }
                 offsetAtt.setOffset(
                         correctOffset(startChange),
