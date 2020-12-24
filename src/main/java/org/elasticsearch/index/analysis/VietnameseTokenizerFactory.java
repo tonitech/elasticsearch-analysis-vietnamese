@@ -30,7 +30,7 @@ public class VietnameseTokenizerFactory extends AbstractTokenizerFactory {
     private final me.duydo.vi.Tokenizer tokenizer;
 
     public VietnameseTokenizerFactory(IndexSettings indexSettings, Environment environment, String name, Settings settings) {
-        super(indexSettings, settings, name);
+        super(indexSettings, name, settings);
         tokenizer = AccessController.doPrivileged((PrivilegedAction<me.duydo.vi.Tokenizer>) me.duydo.vi.Tokenizer::new);
     }
 
