@@ -1,14 +1,11 @@
 package org.elasticsearch.index.analysis;
 
-import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeAction;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.plugin.analysis.vi.AnalysisVietnamesePlugin;
 import org.elasticsearch.plugins.Plugin;
-import org.elasticsearch.plugins.PluginInfo;
 import org.elasticsearch.test.ESIntegTestCase;
 
 import java.io.IOException;
@@ -27,20 +24,6 @@ public class VietnameseAnalysisIntegrationTest extends ESIntegTestCase {
     @Override
     protected Collection<Class<? extends Plugin>> nodePlugins() {
         return Collections.singleton(AnalysisVietnamesePlugin.class);
-    }
-
-    public void testPluginIsLoaded() throws Exception {
-        NodesInfoResponse response = client().admin().cluster().prepareNodesInfo().setPlugins(true).get();
-        for (NodeInfo nodeInfo : response.getNodes()) {
-            boolean pluginFound = false;
-            for (PluginInfo pluginInfo : nodeInfo.getPlugins().getPluginInfos()) {
-                if (pluginInfo.getName().equals(AnalysisVietnamesePlugin.class.getName())) {
-                    pluginFound = true;
-                    break;
-                }
-            }
-            assertThat(pluginFound, is(true));
-        }
     }
 
     public void testVietnameseAnalyzer() throws ExecutionException, InterruptedException {

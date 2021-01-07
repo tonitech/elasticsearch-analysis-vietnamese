@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.elasticsearch</groupId>
     <artifactId>elasticsearch-analysis-vietnamese</artifactId>
-    <version>7.3.1</version>
+    <version>7.10.1</version>
     <packaging>jar</packaging>
     <name>elasticsearch-analysis-vietnamese</name>
     <url>https://github.com/duydo/elasticsearch-analysis-vietnamese/</url>
@@ -31,7 +31,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.java.version>1.8</project.build.java.version>
-        <elasticsearch.version>7.3.1</elasticsearch.version>
+        <elasticsearch.version>7.10.1</elasticsearch.version>
         <log4j.version>2.7</log4j.version>
     </properties>
     <dependencies>
@@ -113,6 +113,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
+                    <executable>/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home/bin/javac</executable>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
